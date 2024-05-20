@@ -36,10 +36,6 @@ exports.signupUser = async (req, res, next) => {
       throw new Error("An error occured while creating user");
     }
 
-    //create JWT token and set cookies after creating user
-    const Token = createJWTtoken(user._id);
-    createCookie(res, Token);
-
     const emailVerificationToken =
       crypto.randomBytes(32).toString("hex") + user._id;
 
@@ -48,6 +44,8 @@ exports.signupUser = async (req, res, next) => {
     user.verificationToken = hashedVerificationToken;
     user.tokenExpiresAt = Date.now() + 60 * 60 * 1000; //token expires in 1 hr
     await user.save();
+
+    //send verification email
 
     res.status(201).json({
       status: "success",
@@ -66,7 +64,7 @@ exports.loginUser = async (req, res, next) => {
     if (!email || !password) {
       throw new Error("All fields are required");
     }
-    //finding user with email and including the password field since it was set to a select of false in the user schema 
+    //finding user with email and including the password field since it was set to a select of false in the user schema
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       throw new Error("Enter a valid email or password");
@@ -90,16 +88,50 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-exports.logoutUser = async () => {
+exports.logoutUser = async (req, res, next) => {
   try {
-  } catch (error) {}
+    await res.clearCookie("userInfo");
+    return res.status(200).json({
+      message: "logout successfull",
+    });
+  } catch (error) {
+    res.status(400);
+    next(err);
+  }
 };
 
-exports.forgotPassword = async () => {
+exports.forgotPassword = async (req,res,next) => {
   try {
-  } catch (error) {}
+    const { email } = req.body;
+    if (!email) {
+      throw new Error("email is required");
+    }
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      throw new Error("User does not exist");
+    }
+
+    const passwordResetToken =
+      crypto.randomBytes(32).toString("hex") + user._id;
+    const hashedToken = HashToken(passwordResetToken);
+
+    existingUser.resetToken = hashedToken;
+    existingUser.tokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1hr
+    await existingUser.save();
+
+    //send password reset email
+
+    res.status(200).json({
+      status: "success",
+      existingUser,
+    });
+  } catch (error) {
+    res.status(400);
+    next(error);
+  }
 };
 exports.resetPassword = async () => {
   try {
+
   } catch (error) {}
 };
