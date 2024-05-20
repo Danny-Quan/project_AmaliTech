@@ -100,7 +100,7 @@ exports.logoutUser = async (req, res, next) => {
   }
 };
 
-exports.forgotPassword = async (req,res,next) => {
+exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -130,8 +130,36 @@ exports.forgotPassword = async (req,res,next) => {
     next(error);
   }
 };
-exports.resetPassword = async () => {
+exports.resetPassword = async (req, res, next) => {
   try {
+    const { resetToken, email } = req.params;
+    const { newPassword, confirmPassword } = req.body;
+    if (!newPassword || !confirmPassword) {
+      throw new Error("All fields are required");
+    }
+    if (newPassword !== confirmPassword) {
+      throw new Error("passwords do not match");
+    }
 
-  } catch (error) {}
+    const hashedResetToken = HashToken(resetToken);
+    const user = await User.find({ email });
+    if (!user) throw new Error("user not found");
+    if (
+      user.resetToken === hashedResetToken &&
+      user.tokenExpiresAt < Date.now()
+    ) {
+      user.password = newPassword;
+      await user.save();
+    } else {
+      throw new Error("reset token is invalid or has expired");
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "password reset successfull",
+    });
+  } catch (error) {
+    ret.status(400);
+    next(error);
+  }
 };
