@@ -10,7 +10,12 @@ const fileSchema = new mongoose.Schema(
       type: String,
       required: [true, "A file require a description"],
     },
-    file: {},
+    fileSize:{
+      type:Number,
+    },
+    filePath: {
+      type:String
+    },
   },
   {
     timestamps: true,
