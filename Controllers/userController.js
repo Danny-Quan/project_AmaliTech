@@ -87,6 +87,30 @@ exports.loginUser = async (req, res, next) => {
     next(error);
   }
 };
+exports.verifyEmail = async (req, res, next) => {
+  try {
+    const { token, email } = req.params;
+    const hashedVerificationToken = HashToken(token);
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("user not found");
+    if (user.isVerified) throw new Error("user already verified");
+    if (
+      user.verificationToken === hashedVerificationToken &&
+      user.tokenExpiresAt < Date.now()
+    ) {
+      user.isVerified = true;
+      await user.save();
+    } else {
+      throw new Error("Invalid Verification token or has expired");
+    }
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (error) {
+    res.status(400);
+    next(error);
+  }
+};
 
 exports.logoutUser = async (req, res, next) => {
   try {
@@ -96,7 +120,7 @@ exports.logoutUser = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400);
-    next(err);
+    next(error);
   }
 };
 
@@ -142,7 +166,7 @@ exports.resetPassword = async (req, res, next) => {
     }
 
     const hashedResetToken = HashToken(resetToken);
-    const user = await User.find({ email });
+    const user = await User.findOne({ email });
     if (!user) throw new Error("user not found");
     if (
       user.resetToken === hashedResetToken &&

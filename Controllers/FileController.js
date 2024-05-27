@@ -78,7 +78,7 @@ exports.updateFile = async (req, res, next) => {
     if (!updatedFile) throw new Error("Error while updating file");
     res.status(200).json({
       status: "success",
-      updatedFile
+      updatedFile,
     });
   } catch (error) {
     res.status(400);
@@ -86,10 +86,17 @@ exports.updateFile = async (req, res, next) => {
   }
 };
 
-exports.deleteFile= async(req,res,next)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+exports.deleteFile = async (req, res, next) => {
+  try {
+    const { fileId } = req.params;
+    const deletedFile = await File.findByIdAndDelete(fileId);
+    if (!deletedFile) throw new Error("Error while deleting file");
+    res.status(200).json({
+      status: "success",
+      message: "File deleted successfully",
+    });
+  } catch (error) {
+    res.status(400);
+    next(error);
+  }
+};
