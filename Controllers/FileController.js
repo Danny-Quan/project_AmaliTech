@@ -100,3 +100,19 @@ exports.deleteFile = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.searchFile = async (req, res, next) => {
+  try {
+    const { query } = req.body;
+    //using the aggregation middleware on mongoose
+    const file = await File.aggregate();
+    if (!file) throw new Error("file not found");
+    res.status(200).json({
+      status: "success",
+      file,
+    });
+  } catch (error) {
+    res.status(404);
+    next(error);
+  }
+};

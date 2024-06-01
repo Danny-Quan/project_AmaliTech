@@ -3,12 +3,13 @@ const { createJWTtoken, HashToken } = require("../Utils/createTokens");
 const crypto = require("node:crypto");
 const bcrypt = require("bcryptjs");
 const User = require("./../Models/userModel");
+const sendMail = require("../Utils/sendMail");
 
 exports.signupUser = async (req, res, next) => {
   try {
-    const { firstname, lastname, email, password, confirmPassword } = req.body;
+    const { username, email, password, confirmPassword } = req.body;
 
-    if (!firstname || !lastname || !email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       throw new Error("All fields are required");
     }
     if (password.length < 6) {
@@ -18,8 +19,7 @@ exports.signupUser = async (req, res, next) => {
       throw new Error("passwords do not match");
     }
     const userData = {
-      firstname,
-      lastname,
+      username,
       email,
       password,
     };
@@ -46,11 +46,18 @@ exports.signupUser = async (req, res, next) => {
     await user.save();
 
     //send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL}/${user.email}/${emailVerificationToken}`;
+    await sendMail(
+      "Welcome to Lizzy's Files",
+      user.email,
+      "welcomeUser",
+      user.username.split(" ")[0],
+      verificationUrl
+    );
 
     res.status(201).json({
       status: "success",
       user,
-      token,
     });
   } catch (error) {
     res.status(400);
@@ -87,7 +94,8 @@ exports.loginUser = async (req, res, next) => {
     next(error);
   }
 };
-exports.verifyEmail = async (req, res, next) => {
+
+exports.verifyUser = async (req, res, next) => {
   try {
     const { token, email } = req.params;
     const hashedVerificationToken = HashToken(token);
@@ -108,6 +116,40 @@ exports.verifyEmail = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400);
+    next(error);
+  }
+};
+
+exports.sendVerificationEmail = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) throw new Error("user not found");
+
+    //create verification token
+    const verificationToken =
+      crypto.randomBytes(32).toString("hex") + req.user._id;
+
+    //hash token and save
+    const hashedToken = HashToken(verificationToken);
+    user.verificationToken = hashedToken;
+    user.tokenExpiresAt = Date.now() + 60 * 60 * 1000;
+    await user.save();
+
+    // verification URL
+    const verificationURL = `${process.env.FRONTEND_URL}/verify/${req.user.email}/${verificationToken}`;
+    //send Email
+    await sendMail(
+      "Verify Your Email",
+      user.email,
+      "verifyEmail",
+      user.username.split(" ")[0],
+      verificationURL
+    );
+    res.status(200).json({
+      message: "Verification email sent",
+    });
+  } catch (error) {
+    res.status(500);
     next(error);
   }
 };
@@ -136,43 +178,60 @@ exports.forgotPassword = async (req, res, next) => {
     }
 
     const passwordResetToken =
-      crypto.randomBytes(32).toString("hex") + user._id;
+      crypto.randomBytes(32).toString("hex") + existingUser._id;
     const hashedToken = HashToken(passwordResetToken);
 
     existingUser.resetToken = hashedToken;
     existingUser.tokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1hr
     await existingUser.save();
 
+    //reset url
+    const resetUrl = `${process.env.FRONTEND_URL}/reset/${existingUser.email}/${passwordResetToken}`;
+
     //send password reset email
+    sendMail(
+      "Reset Password",
+      existingUser.email,
+      "resetPassword",
+      existingUser.username.split(" ")[0],
+      resetUrl
+    );
 
     res.status(200).json({
       status: "success",
       existingUser,
+      passwordResetToken,
     });
   } catch (error) {
     res.status(400);
     next(error);
   }
 };
+
 exports.resetPassword = async (req, res, next) => {
   try {
-    const { resetToken, email } = req.params;
-    const { newPassword, confirmPassword } = req.body;
-    if (!newPassword || !confirmPassword) {
+    // console.log(req.params)
+    const { token, email } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
       throw new Error("All fields are required");
     }
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       throw new Error("passwords do not match");
     }
 
-    const hashedResetToken = HashToken(resetToken);
+    const hashedResetToken = HashToken(token);
     const user = await User.findOne({ email });
     if (!user) throw new Error("user not found");
+
     if (
       user.resetToken === hashedResetToken &&
-      user.tokenExpiresAt < Date.now()
+      Number(user.tokenExpiresAt) > Date.now()
     ) {
-      user.password = newPassword;
+      user.password = password;
+      user.resetToken = undefined;
+      user.tokenExpiresAt = undefined;
       await user.save();
     } else {
       throw new Error("reset token is invalid or has expired");
@@ -183,7 +242,7 @@ exports.resetPassword = async (req, res, next) => {
       message: "password reset successfull",
     });
   } catch (error) {
-    ret.status(400);
+    res.status(400);
     next(error);
   }
 };
