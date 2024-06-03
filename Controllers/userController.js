@@ -55,6 +55,7 @@ exports.signupUser = async (req, res, next) => {
       verificationUrl
     );
 
+    //return status and data on success
     res.status(201).json({
       status: "success",
       user,
@@ -189,7 +190,7 @@ exports.forgotPassword = async (req, res, next) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset/${existingUser.email}/${passwordResetToken}`;
 
     //send password reset email
-    sendMail(
+    await sendMail(
       "Reset Password",
       existingUser.email,
       "resetPassword",

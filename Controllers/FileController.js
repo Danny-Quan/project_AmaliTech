@@ -1,4 +1,5 @@
 const File = require("../Models/FileModel");
+const upload = require("../Utils/imageUpload");
 
 exports.uploadFile = async function (req, res, next) {
   try {
@@ -10,7 +11,8 @@ exports.uploadFile = async function (req, res, next) {
     if (!req.file) {
       throw new Error("File not uploaded");
     }
-    //upload image with multer and run validators
+    //upload file with multer
+    const uploadFile = upload.single("filePath");
 
     //create file
     const newFile = await File.create({ title, description, filePath: file });
