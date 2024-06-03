@@ -1,9 +1,9 @@
 const multer = require("multer");
 
 //configuring multer storage
-const FileStorage = multer.diskStorage({
+const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "/public/uploads");
+    cb(null, "public/uploads/");
   },
   filename: (req, file, cb) => {
     cb(
@@ -14,7 +14,9 @@ const FileStorage = multer.diskStorage({
 });
 
 const upload = multer({
-  storage: FileStorage,
+  storage: multerStorage,
 });
 
-module.exports = upload;
+const loadFile = upload.single("filePath");
+
+module.exports = loadFile;

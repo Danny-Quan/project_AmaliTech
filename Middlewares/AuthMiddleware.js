@@ -1,6 +1,7 @@
 const JWT = require("jsonwebtoken");
 const User = require("./../Models/userModel");
 
+
 const protect = async (req, res, next) => {
   let token;
   try {
@@ -26,7 +27,6 @@ const protect = async (req, res, next) => {
     if (!currentUser) throw new Error("user not found");
     //assign currentUser to any request that will be made and call it user
     req.user = currentUser;
-    console.log(req.user)
     next();
   } catch (error) {
     res.status(401);

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const fileSchema = new mongoose.Schema(
   {
+    adminId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "User",
+    },
     title: {
       type: String,
       required: [true, "A file require a title"],
@@ -10,11 +14,11 @@ const fileSchema = new mongoose.Schema(
       type: String,
       required: [true, "A file require a description"],
     },
-    fileSize:{
-      type:Number,
+    fileSize: {
+      type: Number,
     },
     filePath: {
-      type:String
+      type: String,
     },
   },
   {

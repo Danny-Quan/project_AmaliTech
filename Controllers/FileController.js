@@ -1,8 +1,8 @@
 const File = require("../Models/FileModel");
-const upload = require("../Utils/imageUpload");
 
 exports.uploadFile = async function (req, res, next) {
   try {
+    // console.log(req.body);
     const { title, description } = req.body;
     if (!title || !description) {
       throw new Error("All fields are required");
@@ -11,11 +11,16 @@ exports.uploadFile = async function (req, res, next) {
     if (!req.file) {
       throw new Error("File not uploaded");
     }
-    //upload file with multer
-    const uploadFile = upload.single("filePath");
+    const fileSize = req.file.size;
 
     //create file
-    const newFile = await File.create({ title, description, filePath: file });
+    const newFile = await File.create({
+      adminId: req.user._id,
+      title,
+      description,
+      fileSize,
+      filePath: req.file.filename,
+    });
     if (!newFile) {
       throw new Error("Error uploading file");
     }
@@ -35,6 +40,7 @@ exports.getAllFiles = async function (req, res, next) {
     if (!allFiles) throw new Error("An error occurred");
     res.status(200).json({
       status: "success",
+      files_Length: allFiles.length,
       Files: allFiles,
     });
   } catch (error) {
@@ -63,15 +69,16 @@ exports.updateFile = async (req, res, next) => {
   try {
     const { fileId } = req.params;
     const { title, description } = req.body;
-    if (!title || !description) {
-      throw new Error("All fields are required");
-    }
+  
     if (req.file) {
       //update image
+      console.log("file")
+      var fileSize = req.file.size;
+      var filePath= req.file.filename;
     }
     const updatedFile = await File.findByIdAndUpdate(
       fileId,
-      { title, description },
+      { title, description,fileSize,filePath },
       {
         new: true,
         runValidators: true,
