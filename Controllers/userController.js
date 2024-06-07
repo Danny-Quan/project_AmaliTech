@@ -2,6 +2,7 @@ const createCookie = require("../Utils/cookieHandler");
 const { createJWTtoken, HashToken } = require("../Utils/createTokens");
 const crypto = require("node:crypto");
 const bcrypt = require("bcryptjs");
+const JWT = require("jsonwebtoken");
 const User = require("./../Models/userModel");
 const sendMail = require("../Utils/sendMail");
 
@@ -48,11 +49,11 @@ exports.signupUser = async (req, res, next) => {
     //send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/${user.email}/${emailVerificationToken}`;
     await sendMail(
-      "Welcome to Lizzy's Files",
-      user.email,
-      "welcomeUser",
-      user.username.split(" ")[0],
-      verificationUrl
+      (subject = "Welcome to Lizzy's Files"),
+      (sendTo = user.email),
+      (template = "welcomeUser"),
+      (userName = user.username.split(" ")[0]),
+      (link = verificationUrl)
     );
 
     //return status and data on success
@@ -92,6 +93,28 @@ exports.loginUser = async (req, res, next) => {
     }
   } catch (error) {
     res.status(402);
+    next(error);
+  }
+};
+
+exports.getLoginStatus = async (req, res, next) => {
+  try {
+    let token;
+    //check for JWT token in cookies
+    if (req.cookies.userInfo) {
+      token = req.cookies.userInfo;
+    }
+    if (!token) {
+      return res.json(false);
+    }
+
+    //verify token if token exist
+    const verified = JWT.verify(token, process.env.JWT_SECRET_KEY);
+    if (!verified) {
+      return res.json(false);
+    }
+    return res.json(true);
+  } catch (error) {
     next(error);
   }
 };
@@ -140,11 +163,11 @@ exports.sendVerificationEmail = async (req, res, next) => {
     const verificationURL = `${process.env.FRONTEND_URL}/verify/${req.user.email}/${verificationToken}`;
     //send Email
     await sendMail(
-      "Verify Your Email",
-      user.email,
-      "verifyEmail",
-      user.username.split(" ")[0],
-      verificationURL
+      (subject = "Verify Your Email"),
+      (sendTo = user.email),
+      (template = "verifyEmail"),
+      (userName = user.username.split(" ")[0]),
+      (link = verificationURL)
     );
     res.status(200).json({
       message: "Verification email sent",
@@ -191,11 +214,11 @@ exports.forgotPassword = async (req, res, next) => {
 
     //send password reset email
     await sendMail(
-      "Reset Password",
-      existingUser.email,
-      "resetPassword",
-      existingUser.username.split(" ")[0],
-      resetUrl
+      (subject = "Reset Password"),
+      (sendTo = existingUser.email),
+      (template = "resetPassword"),
+      (userName = existingUser.username.split(" ")[0]),
+      (url = resetUrl)
     );
 
     res.status(200).json({

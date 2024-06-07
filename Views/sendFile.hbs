@@ -22,22 +22,24 @@
       bold; font-size: 1.2rem; }
     </style>
     <div class="container">
-      <h2>Reset Password</h2>
-      <h4>Hi {{userName}},</h4>
-      <p>A password reset for your account was requested</p>
-      <p>Please click the button below to change your password</p>
+      <h2>Welcome!</h2>
+      <h4>Hi,</h4>
       <p>
-        Note that this link is valid for 1 hour. After the time limit has
-        expired, you will have to resubmit the request for a password reset
+        You have received a file from Lizzy's Files. The details of the file are
+        stated below
       </p>
-      <div class="button">
-        <button><a href="{{link}}">Reset Password</a></button>
+      <br />
+      <h4>File Details</h4>
+      <h5>Title: {{fileTitle}}</h5>
+      <br />
+      <div>
+        <span><h5>Description</h5></span><span><p>{{fileDescription}}</p></span>
       </div>
-      <p>If that doesn't work, copy and paste the following in your browser:</p>
-      <a href="{{link}}">{{link}}</a>
       <br />
       <br />
-      <p>If you did not make this request, please ignore this message</p>
+      <p>
+        Thank you for requesting a file from us
+      </p>
     </div>
     <div class="container--two">
       <p>Best Wishes,</p>

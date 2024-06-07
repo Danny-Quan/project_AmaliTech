@@ -20,6 +20,14 @@ const fileSchema = new mongoose.Schema(
     filePath: {
       type: String,
     },
+    downloads: {
+      type: Number,
+      default: 0,
+    },
+    emailsSent: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

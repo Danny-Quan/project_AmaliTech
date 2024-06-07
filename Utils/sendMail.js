@@ -1,14 +1,24 @@
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 
-const sendMail = async function (subject, sendTo, template, name, link) {
+const sendMail = async function (
+  subject,
+  sendTo,
+  template,
+  userName,
+  link,
+  filename,
+  filePath,
+  fileTitle,
+  fileDescription
+) {
   //create transporter
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    PORT: process.env.EMAIL.PORT,
+    PORT: process.env.EMAIL_PORT,
     auth: {
-      user: process.env.EMAIL.USER,
-      pass: process.env.EMAIL.PASS,
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
@@ -36,10 +46,18 @@ const sendMail = async function (subject, sendTo, template, name, link) {
     to: sendTo,
     subject: subject,
     replyTo: "noreply@gmail.com",
+    attachments: [
+      {
+        filename: filename,
+        path: filePath,
+      },
+    ],
     template: template,
     context: {
-      name,
+      userName,
       link,
+      fileTitle,
+      fileDescription
     },
   };
 
@@ -53,4 +71,4 @@ const sendMail = async function (subject, sendTo, template, name, link) {
   });
 };
 
-module.exports= sendMail
+module.exports = sendMail;

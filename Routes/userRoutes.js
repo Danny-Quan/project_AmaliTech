@@ -9,9 +9,12 @@ const {
   verifyUser,
   resetPassword,
   sendVerificationEmail,
+  getLoginStatus,
 } = require("../Controllers/userController");
 
+
 router.post("/login", loginUser);
+router.get("/loginStatus", getLoginStatus);
 router.post("/register", signupUser);
 router.post("/logout", logoutUser);
 router.post("/send-verification-email", protect, sendVerificationEmail);
