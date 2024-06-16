@@ -46,27 +46,31 @@ const sendMail = async function (
     to: sendTo,
     subject: subject,
     replyTo: "noreply@gmail.com",
-    attachments: [
-      {
-        filename: filename,
-        path: filePath,
-      },
-    ],
     template: template,
     context: {
       userName,
       link,
       fileTitle,
-      fileDescription
+      fileDescription,
     },
   };
+
+  if (filename || fileDescription) {
+    emailOptions.attachments = [
+      {
+        filename: filename,
+        path: filePath,
+      },
+    ];
+  }
 
   //send Email
   transporter.sendMail(emailOptions, async (err, data) => {
     if (err) {
       console.log(err);
     } else {
-      console.log(data);
+      // console.log(data);
+      console.log('Email sent successfully')
     }
   });
 };

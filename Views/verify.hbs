@@ -18,26 +18,30 @@
       background: orangered; } .btn-success { color: #fff; background: #29a9e8;
       padding: 15px; } .flex-center { display: flex; justify-content: center;
       align-items: center; } .logo { padding: 5px 1rem; background-color:
-      #29a9e8; } .my { margin: 2rem 0; } a { color: white; }
+      #29a9e8; } .my { margin: 2rem 0; } a { color: white; } .link{
+      background-color:#0a1930; padding: 10px; }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="logo flex-center">
-        <h2 class="color-white">File Received</h2>
+        <h2 class="color-white">Confirm Account</h2>
       </div>
-      <h2>Hi,</h2>
-      <p>
-        You have received a file from Lizzy's Files. The details of the file are
-        stated below
-      </p>
-      <h3>File Details</h3>
-      <span><h4>Title</h4></span><span><p>{{fileTitle}}</p></span>
-      <div>
-        <span><h4>Description</h4></span><span><p>{{fileDescription}}</p></span>
-      </div>
+      <h2>Hello <span class="color-danger">{{userName}}</span>,</h2>
+      <p>Please use the button below to confirm your account</p>
+      <p>This link is valid for 1hr</p>
       <br />
-      <p>Thank you for requesting a file from us</p>
+      <a href="{{link}}" class="btn btn-success">Confirm Account</a>
+      <br />
+      <br />
+      <p>If that doesn't work, copy and paste the following in your browser:</p>
+      <p class="link">
+        <a href="{{link}}">{{link}}</a>
+      </p>
+      <p>
+        Once confirmed, you'll be able to login and download files with your
+        account
+      </p>
       <div class="my">
         <p>Best wishes,</p>
         <p><b class="color-danger">Lizzy's Files</b></p>

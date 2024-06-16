@@ -48,18 +48,25 @@ exports.signupUser = async (req, res, next) => {
 
     //send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/${user.email}/${emailVerificationToken}`;
-    await sendMail(
+    const sendEmail = await sendMail(
       (subject = "Welcome to Lizzy's Files"),
       (sendTo = user.email),
-      (template = "welcomeUser"),
+      (template = "welcome"),
       (userName = user.username.split(" ")[0]),
       (link = verificationUrl)
     );
+    if (!sendEmail) {
+      throw new Error("An error occured");
+    }
 
     //return status and data on success
     res.status(201).json({
       status: "success",
-      user,
+      user: {
+        user: user.username,
+        isVerified: user.isVerified,
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(400);
@@ -87,12 +94,15 @@ exports.loginUser = async (req, res, next) => {
       createCookie(res, token);
       res.status(200).json({
         status: "success",
-        user,
-        token,
+        user: {
+          user: user.username,
+          isVerified: user.isVerified,
+          role: user.role,
+        },
       });
     }
   } catch (error) {
-    res.status(402);
+    res.status(400);
     next(error);
   }
 };
@@ -113,7 +123,15 @@ exports.getLoginStatus = async (req, res, next) => {
     if (!verified) {
       return res.json(false);
     }
-    return res.json(true);
+    const user = await User.findById(verified.id);
+    return res.json({
+      status: true,
+      user: {
+        username: user.username,
+        isVerified: user.isVerified,
+        role: user.role,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -133,7 +151,7 @@ exports.verifyUser = async (req, res, next) => {
       user.isVerified = true;
       await user.save();
     } else {
-      throw new Error("Invalid Verification token or has expired");
+      throw new Error("Invalid verification token or has expired");
     }
     res.status(200).json({
       status: "success",
@@ -162,13 +180,17 @@ exports.sendVerificationEmail = async (req, res, next) => {
     // verification URL
     const verificationURL = `${process.env.FRONTEND_URL}/verify/${req.user.email}/${verificationToken}`;
     //send Email
-    await sendMail(
+    const sendEmail = await sendMail(
       (subject = "Verify Your Email"),
       (sendTo = user.email),
-      (template = "verifyEmail"),
+      (template = "verify"),
       (userName = user.username.split(" ")[0]),
       (link = verificationURL)
     );
+    if (!sendEmail) {
+      throw new Error("An error occured");
+    }
+
     res.status(200).json({
       message: "Verification email sent",
     });
@@ -180,7 +202,11 @@ exports.sendVerificationEmail = async (req, res, next) => {
 
 exports.logoutUser = async (req, res, next) => {
   try {
-    await res.clearCookie("userInfo");
+    await res.clearCookie("userInfo", {
+      path: "/",
+      sameSite: "none",
+      secure: true,
+    });
     return res.status(200).json({
       message: "logout successfull",
     });
@@ -213,13 +239,16 @@ exports.forgotPassword = async (req, res, next) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset/${existingUser.email}/${passwordResetToken}`;
 
     //send password reset email
-    await sendMail(
+    const sendEmail = await sendMail(
       (subject = "Reset Password"),
       (sendTo = existingUser.email),
-      (template = "resetPassword"),
+      (template = "reset"),
       (userName = existingUser.username.split(" ")[0]),
       (url = resetUrl)
     );
+    if (!sendEmail) {
+      throw new Error("An error occured");
+    }
 
     res.status(200).json({
       status: "success",

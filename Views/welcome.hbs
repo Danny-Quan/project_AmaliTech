@@ -24,20 +24,23 @@
   <body>
     <div class="container">
       <div class="logo flex-center">
-        <h2 class="color-white">File Received</h2>
+        <h2 class="color-white">Welcome!</h2>
       </div>
-      <h2>Hi,</h2>
+      <h2>Hello <span class="color-danger">{{userName}}</span>,</h2>
       <p>
-        You have received a file from Lizzy's Files. The details of the file are
-        stated below
+        Thank you for signing up and giving us a try. Our Files Hub offers a
+        vast collection of downloadable Files.
       </p>
-      <h3>File Details</h3>
-      <span><h4>Title</h4></span><span><p>{{fileTitle}}</p></span>
-      <div>
-        <span><h4>Description</h4></span><span><p>{{fileDescription}}</p></span>
-      </div>
+      <p>Please confirm you account by clicking the button below</p>
       <br />
-      <p>Thank you for requesting a file from us</p>
+
+      <a href="{{link}}" class="btn btn-success">Confirm Account</a>
+      <br />
+      <br />
+      <p>
+        Once confirmed, you'll be able to login and download files with your
+        account
+      </p>
       <div class="my">
         <p>Best wishes,</p>
         <p><b class="color-danger">Lizzy's Files</b></p>

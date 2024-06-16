@@ -18,26 +18,33 @@
       background: orangered; } .btn-success { color: #fff; background: #29a9e8;
       padding: 15px; } .flex-center { display: flex; justify-content: center;
       align-items: center; } .logo { padding: 5px 1rem; background-color:
-      #29a9e8; } .my { margin: 2rem 0; } a { color: white; }
+      #29a9e8; } .my { margin: 2rem 0; } a { color: white; } .link {
+      background-color: #0a1930; padding: 10px; }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="logo flex-center">
-        <h2 class="color-white">File Received</h2>
+        <h2 class="color-white">Reset Password</h2>
       </div>
-      <h2>Hi,</h2>
+      <h2>Hello <span class="color-danger">{{userName}}</span>,</h2>
+      <p>A password reset for your account was requested</p>
       <p>
-        You have received a file from Lizzy's Files. The details of the file are
-        stated below
+        Note that this link is valid for 1 hour. After the time limit has
+        expired, you will have to resubmit the request for a password reset
       </p>
-      <h3>File Details</h3>
-      <span><h4>Title</h4></span><span><p>{{fileTitle}}</p></span>
-      <div>
-        <span><h4>Description</h4></span><span><p>{{fileDescription}}</p></span>
-      </div>
+      <p>Please click the button below to change your password</p>
+
       <br />
-      <p>Thank you for requesting a file from us</p>
+      <a href="{{link}}" class="btn btn-success">Reset Password</a>
+      <br />
+      <br />
+      <p>If that doesn't work, copy and paste the following in your browser:</p>
+      <p class="link">
+        <a href="{{link}}">{{link}}</a>
+      </p>
+      <p>If you did not make this request, please ignore this message</p>
+
       <div class="my">
         <p>Best wishes,</p>
         <p><b class="color-danger">Lizzy's Files</b></p>
