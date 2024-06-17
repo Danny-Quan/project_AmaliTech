@@ -47,7 +47,7 @@ exports.signupUser = async (req, res, next) => {
     await user.save();
 
     //send verification email
-    const verificationUrl = `${process.env.FRONTEND_URL}/${user.email}/${emailVerificationToken}`;
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify/${user.email}/${emailVerificationToken}`;
     const sendEmail = await sendMail(
       (subject = "Welcome to Lizzy's Files"),
       (sendTo = user.email),
@@ -146,7 +146,7 @@ exports.verifyUser = async (req, res, next) => {
     if (user.isVerified) throw new Error("user already verified");
     if (
       user.verificationToken === hashedVerificationToken &&
-      user.tokenExpiresAt < Date.now()
+      user.tokenExpiresAt > Date.now()
     ) {
       user.isVerified = true;
       await user.save();
@@ -180,16 +180,18 @@ exports.sendVerificationEmail = async (req, res, next) => {
     // verification URL
     const verificationURL = `${process.env.FRONTEND_URL}/verify/${req.user.email}/${verificationToken}`;
     //send Email
-    const sendEmail = await sendMail(
-      (subject = "Verify Your Email"),
-      (sendTo = user.email),
-      (template = "verify"),
-      (userName = user.username.split(" ")[0]),
-      (link = verificationURL)
-    );
-    if (!sendEmail) {
-      throw new Error("An error occured");
+    const sendEmail  =await sendMail(
+        (subject = "Verify Your Email"),
+        (sendTo = user.email),
+        (template = "verify"),
+        (userName = user.username.split(" ")[0]),
+        (link = verificationURL)
+      );
+    if(!sendEmail){
+        throw new Error("An error occured");
     }
+   
+    
 
     res.status(200).json({
       message: "Verification email sent",

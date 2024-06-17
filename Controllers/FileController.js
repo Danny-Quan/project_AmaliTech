@@ -122,7 +122,7 @@ exports.searchFile = async (req, res, next) => {
     const files = await File.aggregate([
       {
         $search: {
-          index: "default",
+          index: "files",
           text: { query: key, path: { wildcard: "*" } },
         },
       },
@@ -148,7 +148,7 @@ exports.downloadFile = async (req, res, next) => {
     let url = path.join(__dirname, "..", "public/uploads", filename);
     // console.log(encodeURI(url));
 
-    //fetching file
+    // fetching file
     const file = fs.createWriteStream(filename);
     http.get(encodeURI(url), (res) => {
       res.pipe(file);
@@ -159,13 +159,19 @@ exports.downloadFile = async (req, res, next) => {
         console.log("Download Completed");
       });
     });
+    
+    // res.download(url,filename,function(err){
+    //   if(err){
+    //     console.log(err)
+    //   }
+    // })
 
     //download counter
     //incrementing download counts
     downloadableFile.downloads++;
     await downloadableFile.save();
-
-    res.status(200).send("Ok");
+    
+    res.status(200).send('ok')
   } catch (error) {
     res.status(500);
     next(error);
@@ -187,14 +193,18 @@ exports.sendFileToEmail = async (req, res, next) => {
     //find file
     const fileToSend = await File.findById(fileId);
     if (!fileToSend) throw new Error("file not found");
-
+    
+    //file url
+    let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
     //send email to receiver
     const sendEmail = await sendMail(
       (subject = "File Received from Lizzy's Files"),
       (sendTo = receiverEmail),
       (template = "sendFile"),
+      (userName=""),
+      (link=""),
       (filename = fileToSend.filePath),
-      (filePath = encodeURI(fileToSend.filePath)),
+      (filePath = url),
       (fileTitle = fileToSend.title),
       (fileDescription = fileToSend.description)
     );

@@ -3,9 +3,12 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
 dotenv.config({ path: "./config.env" });
-
+const DB = process.env.CLOUD_DATABASE.replace(
+  "<password>",
+  process.env.DB_PASSWORD
+);
 mongoose
-  .connect(process.env.LOCAL_DATABASE)
+  .connect(DB)
   .then((data) => {
     console.log("database connected successfully");
   })

@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 
-const sendMail = async function (
+const sendMail = function (
   subject,
   sendTo,
   template,
@@ -65,7 +65,7 @@ const sendMail = async function (
   }
 
   //send Email
-  transporter.sendMail(emailOptions, async (err, data) => {
+ return transporter.sendMail(emailOptions,  (err, data) => {
     if (err) {
       console.log(err);
     } else {
