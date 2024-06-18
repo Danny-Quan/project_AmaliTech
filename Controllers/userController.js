@@ -48,16 +48,14 @@ exports.signupUser = async (req, res, next) => {
 
     //send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/verify/${user.email}/${emailVerificationToken}`;
-    const sendEmail = await sendMail(
+
+    await sendMail(
       (subject = "Welcome to Lizzy's Files"),
       (sendTo = user.email),
       (template = "welcome"),
       (userName = user.username.split(" ")[0]),
       (link = verificationUrl)
     );
-    if (!sendEmail) {
-      throw new Error("An error occured");
-    }
 
     //return status and data on success
     res.status(201).json({
@@ -180,18 +178,17 @@ exports.sendVerificationEmail = async (req, res, next) => {
     // verification URL
     const verificationURL = `${process.env.FRONTEND_URL}/verify/${req.user.email}/${verificationToken}`;
     //send Email
-    const sendEmail  =await sendMail(
-        (subject = "Verify Your Email"),
-        (sendTo = user.email),
-        (template = "verify"),
-        (userName = user.username.split(" ")[0]),
-        (link = verificationURL)
-      );
-    if(!sendEmail){
-        throw new Error("An error occured");
-    }
-   
-    
+    await sendMail(
+      (subject = "Verify Your Email"),
+      (sendTo = user.email),
+      (template = "verify"),
+      (userName = user.username.split(" ")[0]),
+      (link = verificationURL)
+    )
+      .then(console.log("sent"))
+      .catch((error) => {
+        throw new Error("An error occurred while sending email");
+      });
 
     res.status(200).json({
       message: "Verification email sent",
@@ -241,16 +238,17 @@ exports.forgotPassword = async (req, res, next) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset/${existingUser.email}/${passwordResetToken}`;
 
     //send password reset email
-    const sendEmail = await sendMail(
+    await sendMail(
       (subject = "Reset Password"),
       (sendTo = existingUser.email),
       (template = "reset"),
       (userName = existingUser.username.split(" ")[0]),
       (url = resetUrl)
-    );
-    if (!sendEmail) {
-      throw new Error("An error occured");
-    }
+    )
+      .then(console.log("sent"))
+      .catch((error) => {
+        throw new Error("An error occurred while sending message");
+      });
 
     res.status(200).json({
       status: "success",

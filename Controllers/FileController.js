@@ -159,7 +159,7 @@ exports.downloadFile = async (req, res, next) => {
         console.log("Download Completed");
       });
     });
-    
+
     // res.download(url,filename,function(err){
     //   if(err){
     //     console.log(err)
@@ -170,8 +170,8 @@ exports.downloadFile = async (req, res, next) => {
     //incrementing download counts
     downloadableFile.downloads++;
     await downloadableFile.save();
-    
-    res.status(200).send('ok')
+
+    res.status(200).send("ok");
   } catch (error) {
     res.status(500);
     next(error);
@@ -193,23 +193,25 @@ exports.sendFileToEmail = async (req, res, next) => {
     //find file
     const fileToSend = await File.findById(fileId);
     if (!fileToSend) throw new Error("file not found");
-    
+
     //file url
     let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
     //send email to receiver
-    const sendEmail = await sendMail(
+    await sendMail(
       (subject = "File Received from Lizzy's Files"),
       (sendTo = receiverEmail),
       (template = "sendFile"),
-      (userName=""),
-      (link=""),
+      (userName = ""),
+      (link = ""),
       (filename = fileToSend.filePath),
       (filePath = url),
       (fileTitle = fileToSend.title),
       (fileDescription = fileToSend.description)
-    );
-    //catch email errors
-    if (!sendEmail) throw new Error("An error occurred");
+    )
+      .then(console.log("message sent"))
+      .catch((error) => {
+        throw new Error("An error occurred while sending emial");
+      });
 
     //incrementing emails sent counter
     fileToSend.emailsSent++;

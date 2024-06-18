@@ -41,7 +41,7 @@ const sendMail = function (
   const emailOptions = {
     from: {
       name: "Lizzy's Files",
-      address: "danielsah118@outlook.com",
+      address: process.env.EMAIL_USER,
     },
     to: sendTo,
     subject: subject,
@@ -65,14 +65,7 @@ const sendMail = function (
   }
 
   //send Email
- return transporter.sendMail(emailOptions,  (err, data) => {
-    if (err) {
-      console.log(err);
-    } else {
-      // console.log(data);
-      console.log('Email sent successfully')
-    }
-  });
+ return transporter.sendMail(emailOptions);
 };
 
 module.exports = sendMail;
