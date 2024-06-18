@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const ErrorHandlingMiddleware = require("./Middlewares/ErrorHandlingMiddleware");
+const mongoSanitize= require('express-mongo-sanitize')
 
 const app = express();
 const userRoutes = require("./Routes/userRoutes");
@@ -16,6 +17,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(mongoSanitize())
 
 //imported routes
 app.use("/api/v1/users", userRoutes);
