@@ -31,7 +31,7 @@ app.use(
 app.use(mongoSanitize()); // prevention agains noSql injection
 app.use(helmet()); // Setting HTTP response headers
 app.use(xss()); // prevention agains cross site scripting
-app.use(limiter); // applying rate litter to all requests
+app.use(limiter); // for preventing repeated requests to API
 
 //imported routes
 app.use("/api/v1/users", userRoutes);
