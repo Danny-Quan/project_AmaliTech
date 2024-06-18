@@ -3,6 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const ErrorHandlingMiddleware = require("./Middlewares/ErrorHandlingMiddleware");
 const mongoSanitize= require('express-mongo-sanitize')
+const helmet= require('helmet')
 
 const app = express();
 const userRoutes = require("./Routes/userRoutes");
@@ -17,7 +18,9 @@ app.use(
     credentials: true,
   })
 );
-app.use(mongoSanitize())
+app.use(mongoSanitize()) // prevention agains noSql injection
+app.use(helmet()) // Setting HTTP response headers
+
 
 //imported routes
 app.use("/api/v1/users", userRoutes);
