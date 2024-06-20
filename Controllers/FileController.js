@@ -145,7 +145,9 @@ exports.downloadFile = async (req, res, next) => {
     if (!downloadableFile) throw new Error("file not found");
 
     //building downloadable url
-    let url = path.join(__dirname, "..", "public/uploads", filename);
+    let url =
+      "https://amalitech-lizzy-file-hub.onrender.com" +
+      path.join(__dirname, "..", "public/uploads", filename);
     // console.log(encodeURI(url));
 
     // fetching file
@@ -195,10 +197,10 @@ exports.sendFileToEmail = async (req, res, next) => {
     if (!fileToSend) throw new Error("file not found");
 
     //file url
-    let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
-      console.log("cwd => "+process.cwd())
-      console.log("dirname => "+__dirname)
-      console.log("full URL => "+url)
+    let url =
+      "https://amalitech-lizzy-file-hub.onrender.com" +
+      path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
+    console.log("full URL => " + url);
     //send email to receiver
     await sendMail(
       (subject = "File Received from Lizzy's File Hub"),
@@ -213,7 +215,7 @@ exports.sendFileToEmail = async (req, res, next) => {
     )
       .then(console.log("message sent"))
       .catch((error) => {
-        console.log(error)
+        // console.log(error);
         throw new Error("An error occurred while sending emial");
       });
 
