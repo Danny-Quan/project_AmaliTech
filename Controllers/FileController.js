@@ -16,13 +16,13 @@ exports.uploadFile = async function (req, res, next) {
       throw new Error("File not uploaded");
     }
     const fileSize = req.file.size;
-    console.log(req.file)
 
     //create file
     const newFile = await File.create({
       adminId: req.user._id,
       title,
       description,
+      fileName: req.file.filename,
       fileSize,
       filePath: req.file.path,
     });
@@ -145,34 +145,21 @@ exports.downloadFile = async (req, res, next) => {
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
-    //building downloadable url
-    let url = path.join(__dirname, "..", "public/uploads", filename);
-    // console.log(encodeURI(url));
-
-    // fetching file
-    const file = fs.createWriteStream(filename);
-    http.get(encodeURI(url), (res) => {
-      res.pipe(file);
-
-      //after download close filestream
-      filePath.on("finish", () => {
-        file.close();
-        console.log("Download Completed");
-      });
-    });
-
-    // res.download(url,filename,function(err){
-    //   if(err){
-    //     console.log(err)
-    //   }
-    // })
-
-    //download counter
+    const url = path.resolve(downloadableFile.filePath);
+    res.download(downloadableFile.filePath, filename,
+      (err)=>{
+      if(err){
+        console.log(err)
+        res.status(500).json({message:"Error downloading file"})
+      }
+      console.log('Download initiated!')
+    }
+    )
     //incrementing download counts
     downloadableFile.downloads++;
     await downloadableFile.save();
 
-    res.status(200).send("ok");
+    // res.status(200).send("ok");
   } catch (error) {
     res.status(500);
     next(error);
@@ -195,18 +182,14 @@ exports.sendFileToEmail = async (req, res, next) => {
     const fileToSend = await File.findById(fileId);
     if (!fileToSend) throw new Error("file not found");
 
-    //file url
-    // let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
-    // console.log("full URL => " + url);
     //send email to receiver
-    console.log("Full URL => "+fileToSend.filePath)
     await sendMail(
       (subject = "File Received from Lizzy's File Hub"),
       (sendTo = receiverEmail),
       (template = "sendFile"),
       (userName = ""),
       (link = ""),
-      (filename = fileToSend.filePath),
+      (filename = fileToSend.fileName),
       (filePath = fileToSend.filePath),
       (fileTitle = fileToSend.title),
       (fileDescription = fileToSend.description)

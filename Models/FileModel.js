@@ -14,6 +14,9 @@ const fileSchema = new mongoose.Schema(
       type: String,
       required: [true, "A file require a description"],
     },
+    fileName: { 
+      type: String 
+    },
     fileSize: {
       type: Number,
     },
