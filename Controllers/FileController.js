@@ -16,6 +16,7 @@ exports.uploadFile = async function (req, res, next) {
       throw new Error("File not uploaded");
     }
     const fileSize = req.file.size;
+    console.log(req.file)
 
     //create file
     const newFile = await File.create({
@@ -23,7 +24,7 @@ exports.uploadFile = async function (req, res, next) {
       title,
       description,
       fileSize,
-      filePath: req.file.filename,
+      filePath: req.file.path,
     });
     if (!newFile) {
       throw new Error("Error uploading file");
@@ -145,9 +146,7 @@ exports.downloadFile = async (req, res, next) => {
     if (!downloadableFile) throw new Error("file not found");
 
     //building downloadable url
-    let url =
-      "https://amalitech-lizzy-file-hub.onrender.com" +
-      path.join(__dirname, "..", "public/uploads", filename);
+    let url = path.join(__dirname, "..", "public/uploads", filename);
     // console.log(encodeURI(url));
 
     // fetching file
@@ -197,11 +196,10 @@ exports.sendFileToEmail = async (req, res, next) => {
     if (!fileToSend) throw new Error("file not found");
 
     //file url
-    let url =
-      "https://amalitech-lizzy-file-hub.onrender.com" +
-      path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
-    console.log("full URL => " + url);
+    // let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
+    // console.log("full URL => " + url);
     //send email to receiver
+    console.log("Full URL => "+fileToSend.filePath)
     await sendMail(
       (subject = "File Received from Lizzy's File Hub"),
       (sendTo = receiverEmail),
@@ -209,7 +207,7 @@ exports.sendFileToEmail = async (req, res, next) => {
       (userName = ""),
       (link = ""),
       (filename = fileToSend.filePath),
-      (filePath = url),
+      (filePath = fileToSend.filePath),
       (fileTitle = fileToSend.title),
       (fileDescription = fileToSend.description)
     )
