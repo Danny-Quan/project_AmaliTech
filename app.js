@@ -25,20 +25,23 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://amalitech-lizzy-file-hub.netlify.app",
+    // origin:"http://localhost:3000",
     credentials: true,
   })
 );
 app.use(mongoSanitize()); // prevention agains noSql injection
 app.use(helmet()); // Setting HTTP response headers
 app.use(xss()); // prevention agains cross site scripting
-app.use(limiter); // for preventing repeated requests to API
+// app.use(limiter); // for preventing repeated requests to API
 
 //imported routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/files", fileRoutes);
 
 app.get("/", (req, res) => {
-  res.send("hello to backend");
+  res.json({
+    message:"Welcome to Lizzy's file Hub api"
+  });
 });
 
 //using global error handler. It receives and process all errors passed to next()

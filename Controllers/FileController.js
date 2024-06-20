@@ -196,9 +196,12 @@ exports.sendFileToEmail = async (req, res, next) => {
 
     //file url
     let url = path.join(__dirname, "..", "public/uploads", fileToSend.filePath);
+      console.log("cwd => "+process.cwd())
+      console.log("dirname => "+__dirname)
+      console.log("full URL => "+url)
     //send email to receiver
     await sendMail(
-      (subject = "File Received from Lizzy's Files"),
+      (subject = "File Received from Lizzy's File Hub"),
       (sendTo = receiverEmail),
       (template = "sendFile"),
       (userName = ""),
@@ -210,6 +213,7 @@ exports.sendFileToEmail = async (req, res, next) => {
     )
       .then(console.log("message sent"))
       .catch((error) => {
+        console.log(error)
         throw new Error("An error occurred while sending emial");
       });
 

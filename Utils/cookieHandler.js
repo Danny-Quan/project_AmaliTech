@@ -3,8 +3,8 @@ const createCookie = (res, token) => {
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5),
     path:"/",
     httpOnly: true,
-    sameSite: "none",
     secure: true,
+    sameSite:"none",
   });
   return cookies;
 };
