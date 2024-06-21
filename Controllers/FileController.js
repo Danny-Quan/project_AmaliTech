@@ -139,11 +139,10 @@ exports.searchFile = async (req, res, next) => {
 exports.downloadFile = async (req, res, next) => {
   try {
     const { filename, fileId } = req.params;
-    console.log(filename,fileId)
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
-    console.log("FILE PATH => "+ downloadable.filePath)
+    console.log("FILE PATH => "+ downloadableFile.filePath)
     res.download(downloadableFile.filePath, filename,(err)=>{
       if(err){
         console.log(err)
