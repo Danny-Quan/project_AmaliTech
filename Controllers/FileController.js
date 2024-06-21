@@ -139,6 +139,7 @@ exports.searchFile = async (req, res, next) => {
 exports.downloadFile = async (req, res, next) => {
   try {
     const { filename, fileId } = req.params;
+    console.log(filename,fileId)
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
@@ -192,7 +193,7 @@ exports.sendFileToEmail = async (req, res, next) => {
     )
       .then(console.log("message sent"))
       .catch((error) => {
-        // console.log(error);
+        console.log(error);
         throw new Error("An error occurred while sending email");
       });
 
