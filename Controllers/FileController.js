@@ -145,12 +145,11 @@ exports.downloadFile = async (req, res, next) => {
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
-    const url = path.resolve(downloadableFile.filePath);
     res.download(downloadableFile.filePath, filename,
       (err)=>{
       if(err){
         console.log(err)
-        res.status(500).json({message:"Error downloading file"})
+        throw new Error('Error downloading file')
       }
       console.log('Download initiated!')
     }
