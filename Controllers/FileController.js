@@ -1,6 +1,3 @@
-const fs = require("fs");
-const http = require("http");
-const path = require("path");
 const File = require("../Models/FileModel");
 const sendMail = require("../Utils/sendMail");
 
@@ -145,11 +142,12 @@ exports.downloadFile = async (req, res, next) => {
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
+    console.log("FILE PATH => "+ downloadable.filePath)
     res.download(downloadableFile.filePath, filename,
       (err)=>{
       if(err){
         console.log(err)
-        throw new Error('Error downloading file')
+        return res.status(500).json({message:"Error downloading file"})
       }
       console.log('Download initiated!')
     }
