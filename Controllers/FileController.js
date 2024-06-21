@@ -143,8 +143,7 @@ exports.downloadFile = async (req, res, next) => {
     if (!downloadableFile) throw new Error("file not found");
 
     console.log("FILE PATH => "+ downloadable.filePath)
-    res.download(downloadableFile.filePath, filename,
-      (err)=>{
+    res.download(downloadableFile.filePath, filename,(err)=>{
       if(err){
         console.log(err)
         return res.status(500).json({message:"Error downloading file"})
@@ -194,7 +193,7 @@ exports.sendFileToEmail = async (req, res, next) => {
       .then(console.log("message sent"))
       .catch((error) => {
         // console.log(error);
-        throw new Error("An error occurred while sending emial");
+        throw new Error("An error occurred while sending email");
       });
 
     //incrementing emails sent counter
