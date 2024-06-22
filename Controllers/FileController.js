@@ -1,5 +1,7 @@
+const fs = require("fs");
 const File = require("../Models/FileModel");
 const sendMail = require("../Utils/sendMail");
+const dbx = require("../Utils/dropboxConfig");
 
 exports.uploadFile = async function (req, res, next) {
   try {
@@ -12,25 +14,59 @@ exports.uploadFile = async function (req, res, next) {
     if (!req.file) {
       throw new Error("File not uploaded");
     }
+
     const fileSize = req.file.size;
+    const filePath = req.file.path;
+    const fileName = req.file.filename;
+    const fileContent = fs.readFileSync(req.file.path);
+
+    // Upload file to Dropbox
+    const response = await dbx.filesUpload({
+      path: "/" + fileName,
+      contents: fileContent,
+      mode: { ".tag": "overwrite" },
+    });
+
+    // Remove the file from the server after uploading to Dropbox
+    fs.unlinkSync(filePath, (err) => {
+      if (err) {
+        console.log("Error deleting temporal file");
+      }
+    });
+
+    // Generate a shared link for the uploaded file
+    const sharedLink = await dbx.sharingCreateSharedLinkWithSettings({
+      path: "/" + fileName,
+    });
+    // console.log(sharedLink.result.url);
 
     //create file
     const newFile = await File.create({
       adminId: req.user._id,
       title,
       description,
-      fileName: req.file.filename,
+      fileName,
       fileSize,
-      filePath: req.file.path,
+      filePath: sharedLink.result.url,
     });
     if (!newFile) {
       throw new Error("Error uploading file");
     }
     res.status(201).json({
       status: "success",
+      message: "File upload successfully",
       newFile,
     });
   } catch (error) {
+    // console.log(error)
+    try {
+      // Clean up the temporary file if upload to Dropbox fails
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (clearnupError) {
+      console.log("There was an error cleaning up file");
+    }
     res.status(400);
     next(error);
   }
@@ -73,15 +109,45 @@ exports.updateFile = async (req, res, next) => {
     const { fileId } = req.params;
     const { title, description } = req.body;
 
+    let fileSize;
+    let fileName;
+    let sharedLink;
     if (req.file) {
       //update image
-      console.log("file");
-      var fileSize = req.file.size;
-      var filePath = req.file.filename;
+      fileSize = req.file.size;
+      const filePath = req.file.path;
+      fileName = req.file.filename;
+      const fileContent = fs.readFileSync(req.file.path);
+
+      // Upload file to Dropbox
+      const response = await dbx.filesUpload({
+        path: "/" + fileName,
+        contents: fileContent,
+        mode: { ".tag": "overwrite" },
+      });
+
+      // Remove the file from the server after uploading to Dropbox
+      fs.unlinkSync(filePath, (err) => {
+        if (err) {
+          console.log("Error deleting temporal file");
+        }
+      });
+
+      // Generate a shared link for the uploaded file
+      sharedLink = await dbx.sharingCreateSharedLinkWithSettings({
+        path: "/" + fileName,
+      });
     }
+
     const updatedFile = await File.findByIdAndUpdate(
       fileId,
-      { title, description, fileSize, filePath },
+      {
+        title,
+        description,
+        fileSize: fileSize,
+        filePath: sharedLink?.result?.url,
+        fileName: fileName,
+      },
       {
         new: true,
         runValidators: true,
@@ -93,6 +159,14 @@ exports.updateFile = async (req, res, next) => {
       updatedFile,
     });
   } catch (error) {
+    try {
+      // Clean up the temporary file if upload to Dropbox fails
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (clearnupError) {
+      console.log("There was an error cleaning up file");
+    }
     res.status(400);
     next(error);
   }
@@ -142,20 +216,28 @@ exports.downloadFile = async (req, res, next) => {
     const downloadableFile = await File.findById(fileId);
     if (!downloadableFile) throw new Error("file not found");
 
-    console.log("FILE PATH => "+ downloadableFile.filePath)
-    res.download(downloadableFile.filePath, filename,(err)=>{
-      if(err){
-        console.log(err)
-        return res.status(500).json({message:"Error downloading file"})
-      }
-      console.log('Download initiated!')
+    try {
+      var downloadResponse = await dbx.filesDownload({
+        path: `/${filename}`,
+      });
+      // console.log(downloadResponse);
+      console.log("file downloaded successfully");
+    } catch (error) {
+      // console.log(error);
+      console.log("error downloading file");
     }
-    )
+
+    const fileData = downloadResponse.result.fileBinary;
+    // console.log(fileData)
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.send(fileData);
+
     //incrementing download counts
     downloadableFile.downloads++;
     await downloadableFile.save();
 
-    // res.status(200).send("ok");
+    res.status(200);
   } catch (error) {
     res.status(500);
     next(error);
