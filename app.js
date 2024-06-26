@@ -14,7 +14,7 @@ const fileRoutes = require("./Routes/FileRoutes");
 //rate limiter configuration here
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: 150,
   message: "Too many requests from this IP, please try again in 15 minues time",
   statusCode: 429,
 });
@@ -32,7 +32,7 @@ app.use(
 app.use(mongoSanitize()); // prevention agains noSql injection
 app.use(helmet()); // Setting HTTP response headers
 app.use(xss()); // prevention agains cross site scripting
-// app.use(limiter); // for preventing repeated requests to API
+app.use(limiter); // for preventing repeated requests to API
 
 //imported routes
 app.use("/api/v1/users", userRoutes);
