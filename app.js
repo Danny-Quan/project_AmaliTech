@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://amalitech-lizzy-file-hub.netlify.app",
-    // origin:"http://localhost:3000",
+    // origin:"http://127.0.0.1:3000",
     credentials: true,
   })
 );
