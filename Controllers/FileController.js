@@ -1,7 +1,9 @@
 const fs = require("fs");
 const File = require("../Models/FileModel");
+const { Dropbox } = require("dropbox");
 const sendMail = require("../Utils/sendMail");
-const dbx = require("../Utils/dropboxConfig");
+const fetch = require("isomorphic-fetch");
+const refreshAccessToken = require("../Utils/dropboxConfig");
 
 exports.uploadFile = async function (req, res, next) {
   try {
@@ -20,6 +22,14 @@ exports.uploadFile = async function (req, res, next) {
     const fileName = req.file.filename;
     const fileContent = fs.readFileSync(req.file.path);
 
+    //get access token
+    const accessToken = await refreshAccessToken();
+
+    //configuring dropbox
+    const dbx = new Dropbox({
+      accessToken: accessToken,
+      fetch,
+    });
     // Upload file to Dropbox
     const response = await dbx.filesUpload({
       path: "/" + fileName,
@@ -58,7 +68,6 @@ exports.uploadFile = async function (req, res, next) {
       newFile,
     });
   } catch (error) {
-    // console.log(error)
     try {
       // Clean up the temporary file if upload to Dropbox fails
       if (fs.existsSync(filePath)) {
@@ -119,6 +128,14 @@ exports.updateFile = async (req, res, next) => {
       fileName = req.file.filename;
       const fileContent = fs.readFileSync(req.file.path);
 
+      //get access token
+      const accessToken = await refreshAccessToken();
+
+      //configuring dropbox
+      const dbx = new Dropbox({
+        accessToken: accessToken,
+        fetch,
+      });
       // Upload file to Dropbox
       const response = await dbx.filesUpload({
         path: "/" + fileName,
@@ -217,6 +234,15 @@ exports.downloadFile = async (req, res, next) => {
     if (!downloadableFile) throw new Error("file not found");
 
     try {
+      //get access token
+      const accessToken = await refreshAccessToken();
+
+      //configuring dropbox
+      const dbx = new Dropbox({
+        accessToken: accessToken,
+        fetch,
+      });
+
       var downloadResponse = await dbx.filesDownload({
         path: `/${filename}`,
       });

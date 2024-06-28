@@ -10,7 +10,7 @@ const {
   deleteFile,
   searchFile,
   downloadFile,
-  sendFileToEmail
+  sendFileToEmail,
 } = require("../Controllers/FileController");
 
 
