@@ -46,6 +46,7 @@ const userSchema = new mongoose.Schema(
 );
 
 //creating a 'pre' document middleware for mongoose
+//hash password before saving in database
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();

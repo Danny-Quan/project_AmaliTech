@@ -7,7 +7,6 @@ const refreshAccessToken = require("../Utils/dropboxConfig");
 
 exports.uploadFile = async function (req, res, next) {
   try {
-    // console.log(req.file);
     const { title, description } = req.body;
     if (!title || !description) {
       throw new Error("All fields are required");
@@ -83,14 +82,17 @@ exports.uploadFile = async function (req, res, next) {
 
 exports.getAllFiles = async function (req, res, next) {
   try {
+    //get all files from database
     const allFiles = await File.find();
     if (!allFiles) throw new Error("An error occurred");
+    //return files if on success
     res.status(200).json({
       status: "success",
       files_Length: allFiles.length,
       Files: allFiles,
     });
   } catch (error) {
+    //throw error if on error
     res.status(500);
     next(error);
   }
@@ -192,13 +194,16 @@ exports.updateFile = async (req, res, next) => {
 exports.deleteFile = async (req, res, next) => {
   try {
     const { fileId } = req.params;
+    //find item in database and delete
     const deletedFile = await File.findByIdAndDelete(fileId);
     if (!deletedFile) throw new Error("an error occurred");
+    //return status if on success
     res.status(200).json({
       status: "success",
       message: "File deleted successfully",
     });
   } catch (error) {
+    //return error if on error
     res.status(400);
     next(error);
   }
@@ -255,6 +260,8 @@ exports.downloadFile = async (req, res, next) => {
 
     const fileData = downloadResponse.result.fileBinary;
     // console.log(fileData)
+    
+    //setting download headers
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.setHeader("Content-Type", "application/octet-stream");
     res.send(fileData);
