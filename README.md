@@ -75,7 +75,3 @@ This project is a file server application that allows users to easily access, sh
 
 2. **Accessing the Application:** 
     - The application will typically start on a default port 8000.
-
-**Additional Notes:**
-
-
