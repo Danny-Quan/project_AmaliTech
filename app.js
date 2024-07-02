@@ -12,6 +12,8 @@ const userRoutes = require("./Routes/userRoutes");
 const fileRoutes = require("./Routes/FileRoutes");
 
 //rendering frontend
+const staticPath = path.resolve(__dirname, 'public/build');
+console.log(staticPath)
 app.use(express.static(path.resolve(__dirname,'public/build')));
 
 app.use(express.json());
