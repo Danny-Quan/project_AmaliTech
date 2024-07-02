@@ -5,13 +5,14 @@ const ErrorHandlingMiddleware = require("./Middlewares/ErrorHandlingMiddleware")
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const { xss } = require("express-xss-sanitizer");
+const path= require('path')
 
 const app = express();
 const userRoutes = require("./Routes/userRoutes");
 const fileRoutes = require("./Routes/FileRoutes");
 
 //rendering frontend
-app.use(express.static('public/build'));
+app.use(express.static(path.resolve(__dirname,'public/build')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
