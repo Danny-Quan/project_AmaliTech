@@ -12,9 +12,9 @@ const userRoutes = require("./Routes/userRoutes");
 const fileRoutes = require("./Routes/FileRoutes");
 
 //rendering frontend
-const staticPath = path.resolve(__dirname, 'public/build');
+const staticPath = path.join(__dirname, 'public/build');
 console.log(staticPath)
-app.use(express.static(path.resolve(__dirname,'public/build')));
+app.use(express.static(path.join(__dirname,'public/build')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +34,10 @@ app.use(xss()); // prevention agains cross site scripting
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/files", fileRoutes);
 
+// Catch-all route to handle all other requests (serve your frontend application)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/build', 'index.html'));
+});
 // app.get("/", (req, res) => {
 //   res.json({
 //     message:"Welcome to Lizzy's file Hub api"
