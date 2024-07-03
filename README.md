@@ -78,6 +78,6 @@ This project is a file server application that allows users to easily access, sh
 
 2. **Accessing the Application:** 
     - The application will typically start on a default port 8000.
-    - for testing purpose, use email: admin@lizzyfileshub.io and password: daniel to login as an admin
+    - for testing purpose, use the following details to login as an admin email: admin@lizzyfileshub.io and password: daniel
     - to login as a user, click the register button and signup
     - **Note:** sometimes mail get trapped in spam folders so do well to check spam folders when expecting an email
