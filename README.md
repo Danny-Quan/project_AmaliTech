@@ -5,10 +5,8 @@
 
 **NOTE**
 
-    - for testing purpose, use the following details to login as an admin **email:** admin@lizzyfileshub.io and **password:** daniel
-    
+    - for testing purpose, use the following details to login as an admin **email:** admin@lizzyfileshub.io and **password:** daniel 
     - to login as a user, click the register button and signup
-    
     - **Note:** sometimes mail get trapped in spam folders so do well to check spam folders when expecting an email
 
 **# File Sharer**
