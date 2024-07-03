@@ -2,6 +2,7 @@
 
 
 **PROJECT URL:** https://amalitech-lizzy-file-hub.onrender.com
+
 **NOTE**
     - for testing purpose, use the following details to login as an admin **email:** admin@lizzyfileshub.io and **password:** daniel
     
