@@ -2,6 +2,10 @@
 
 
 **PROJECT URL:** https://amalitech-lizzy-file-hub.onrender.com
+**NOTE**
+    - for testing purpose, use the following details to login as an admin **email:** admin@lizzyfileshub.io and **password:** daniel
+    - to login as a user, click the register button and signup
+    - **Note:** sometimes mail get trapped in spam folders so do well to check spam folders when expecting an email
 
 **# File Sharer**
 This project is a file server application that allows users to easily access, share, and manage files anytime and anywhere. It provides a user-friendly interface for browsing, downloading, and sending files via email, eliminating the need for traditional methods of file distribution.
@@ -78,6 +82,4 @@ This project is a file server application that allows users to easily access, sh
 
 2. **Accessing the Application:** 
     - The application will typically start on a default port 8000.
-    - for testing purpose, use the following details to login as an admin email: admin@lizzyfileshub.io and password: daniel
-    - to login as a user, click the register button and signup
-    - **Note:** sometimes mail get trapped in spam folders so do well to check spam folders when expecting an email
+
